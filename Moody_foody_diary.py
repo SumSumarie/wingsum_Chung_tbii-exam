@@ -695,8 +695,13 @@ def food():
     #adding the random recipy based on the colours that the users selected
     add_image(root, f'images/{random.choice(options)}',screen_width,screen_height)
     #adding a close button leading to the daypage of the changed-colour day button, but it doesn't work
-    close_button = tk.Button(text='close', fg='grey', font='optima 9 bold', height=1,width=4, command=lambda:daypage2(day_selection))
-    close_button.place(relx=0.5, anchor='center', y=635)
+    save_button = tk.Button(text='Save', fg='grey', font='optima 9 bold', height=1,width=4)
+    save_button.place(relx=0.5, anchor='center', y=635)
+    # create a home page button
+    homepage = tk.Button(root,
+                         text="🏠",
+                         command=main_page)
+    homepage.place(relx=0.2, anchor='ne', y=15)
 
 
 def create_returning_user_page():

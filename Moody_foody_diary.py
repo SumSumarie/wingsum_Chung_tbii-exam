@@ -20,21 +20,19 @@ root.minsize(screen_width,screen_height)
 
 def home_button():
     """This is a definition of the button for going back to home page """
-    # create a home page button
+    # create and place a home page button
     homepage = tk.Button(root,
                          text="🏠",
                          command=home_page)
-    # place the homepage button
     homepage.place(relx=0.5, anchor='center', y=620)
 
 def back_button(page):
     """This is a definition of the button for going back to the previous page"""
-    #create a Back button
+    #create and place a Back button
     back=tk.Button(root,
                     text="⬅",
                     command=page
                    )
-    #place the Back button
     back.place(relx = 0.2,anchor = 'ne',y=15)
 
 def enter_user_data():
@@ -52,7 +50,7 @@ def enter_user_data():
         user_data = {
             "username":username.get(),
             "magic_key":magic_key.get(),
-            #"birthday": birthday.get(),
+            "birthday": birthday,
             "create_at":current_timestamp
         }
         # converting the dictionary to a data frame
@@ -65,6 +63,7 @@ def enter_user_data():
                  text=(f"Thank you for submitting your data {username.get()}")
                  )
         thank_button.place(x=150,y=200)
+
 
 def home_page():
     """This the home page"""
@@ -79,56 +78,51 @@ def home_page():
     pg.mixer.music.play()
     #add the image in the main page
     add_image(root, 'images/beginning_smile.png',screen_width,screen_height)
-    # print a message saying 'Open your Moody Foody Diary'
+    # add a message saying 'Open your Moody Foody Diary'
     title_label = tk.Label(root,
                            text='This is your Moody Foody Diary',
                            font='optima 20 bold',
                            bg='light yellow',
                            borderwidth=25)
-    # place this title_label button
     title_label.place(relx = 0.5,anchor = 'center',y=150)
-    # print a message asking the user for their user name
+    # add a message asking the user for their user name
     username_label = tk.Label(root, text='Username', font='optima 20 bold', borderwidth=3)
-    # place this username label
     username_label.place(x=20,y=250)
-    #create a user-name entry box
+    #add a user-name entry box
     username=tk.StringVar()
     username_entry=tk.Entry(root,
                         textvar=username,
                         font='optima 20 bold',
                         width=15)
-    # place the user-name entry box
     username_entry.place(x=130,y=250)
-    # print a message asking the user for their magic key to open the diary
+    # add a message asking the user for their magic key to open the diary
     magic_key_label = tk.Label(root, text='Magic Key', font='optima 20 bold', borderwidth=3)
-    # where would you like to place this label
     magic_key_label.place(x=20,y=300)
-    # create a magic-key entry box
+    # add a magic-key entry box
     magic_key=tk.StringVar()
     magic_key_entry=tk.Entry(root,
                         textvar=magic_key,
                         font='optima 20 bold',
                         width=15)
     magic_key_entry.place(x=130,y=300)
-    # print a message asking the user for their birthday
+    # add a message asking the user for their birthday
     birthday_label = tk.Label(root, text='Birthday', font='optima 20 bold', borderwidth=3)
-    # where would you like to place this button
     birthday_label.place(x=20,y=350)
-    #create a calendar behind the label birthday
+    # add a calendar behind the label birthday
     cal = DateEntry(root,
                     width=18,
                     height=55,
                     selectmode="day")
-    # place the calendar
     cal.place(x=130, y=350)
+
     #the calendar can get the date the users chose
     birthday= cal.get_date()
-    #create the button to click to create a diary
+    print(birthday)
+    #add the button to click to create a diary
     create_diary_button=tk.Button(root,
                             text="create your diary",
                             font='optima 20 bold',
                             command=calendar_page)
-    #place the button
     create_diary_button.place(relx = 0.5,anchor = 'center',y=500)
     """
     #create the button to click to create_returning_user_page
@@ -151,31 +145,27 @@ def calendar_page():
     back_button(home_page)
     #place the button to go back to main page from the home_button definition
     home_button()
-    # create the view_diary button
+    # add the view_diary button
     view_diary = tk.Button(root,
                            font=("Optima", 25, "bold"),
                            text="View your diaries",
                            command=view_diary_page
                            )
-    # place the view_diary button
     view_diary.place(relx=0.5, anchor='center', y=400)
-    #create a create_diary button for entering the diary information
+    #add a create_diary button for entering the diary information
     create_diary = tk.Button(root,
                          text="Create a new diary",
                          font=("Optima", 25, "bold"),
                          command=mood_colour_page
                          )
-    #place the create_diary button
     create_diary.place(relx=0.5, anchor='center', y=500)
-    #create a welcome label
+    #add a welcome label
     welcome_label=tk.Label(root,
                            text=(f"{username.get()}, "
                                  "welcome to your own Moody Foody Diary"),
                            font=("Optima", 15,"bold")
                             )
-    #place the welcome label
     welcome_label.place(relx = 0.5,anchor = 'center',y=100)
-
     #get the date of today
     current_date = date.today()
     #add a calendar to choose the date of today
@@ -184,7 +174,6 @@ def calendar_page():
                    year=current_date.year,
                    month=current_date.month,
                    day=current_date.day)
-    #place the calendar
     cal.place(relx = 0.5,anchor = 'center',y=270)
 
 def mood_colour_page():
@@ -197,15 +186,14 @@ def mood_colour_page():
     back_button(calendar_page)
     #place the button to go back to main page from the home_button definition
     home_button()
-    #print a message asking for the colour of the mood today
+    #add a message asking for the colour of the mood today
     question_label = tk.Label(root, text='What is the colour of your mood today?',
                               font='optima 18 bold',
                               bg='light yellow',
                               fg='black',
                               borderwidth=12)
-    # place the message
     question_label.place(relx=0.5, anchor='center', y=100)
-    # The button to choose red as the colour of the mood today
+    #Add the button to choose red as the colour of the mood today
     red_button = tk.Button(text=':)',
                            fg='red',
                            font='Arial 20 bold',
@@ -213,9 +201,8 @@ def mood_colour_page():
                            width=10,
                            command=lambda: mood_emoji_page("red_button")
                            )
-    # place the red button
     red_button.place(relx=0.5, rely=0.57, anchor='center', y=-195)
-     # The button to choose orange as the colour of the mood today
+     #Add the button to choose orange as the colour of the mood today
     orange_button = tk.Button(text=':)',
                               fg='orange',
                               font='Arial 20 bold',
@@ -223,9 +210,8 @@ def mood_colour_page():
                               width=10,
                               command=lambda: mood_emoji_page("orange_button")
                               )
-    # place the orange button
     orange_button.place(relx=0.5, rely=0.57, anchor='center', y=-130)
-    # The button to choose yellow as the colour of the mood today
+    # Add the button to choose yellow as the colour of the mood today
     yellow_button = tk.Button(text=':)',
                               fg='yellow',
                               font='Arial 20 bold',
@@ -233,9 +219,8 @@ def mood_colour_page():
                               width=10,
                               command=lambda: mood_emoji_page("yellow_button")
                               )
-    # place the yellow button
     yellow_button.place(relx=0.5, rely=0.57, anchor='center', y=-65)
-    # The button to choose green as the colour of the mood today
+    # Add the button to choose green as the colour of the mood today
     green_button = tk.Button(text=':)',
                              fg='green',
                              font='Arial 20 bold',
@@ -243,9 +228,8 @@ def mood_colour_page():
                              width=10,
                              command=lambda: mood_emoji_page("green_button")
                              )
-    # place the green button
     green_button.place(relx=0.5, rely=0.57, anchor='center', y=0)
-    # The button to choose Indigo as the colour of the mood today
+    # Add the button to choose Indigo as the colour of the mood today
     cyan_button = tk.Button(text=':)',
                             fg='cyan',
                             font='Arial 20 bold',
@@ -253,9 +237,8 @@ def mood_colour_page():
                             width=10,
                             command=lambda: mood_emoji_page("cyan_button")
                             )
-    # place the cyan button
     cyan_button.place(relx=0.5, rely=0.57, anchor='center', y=65)
-    # The button to choose blue as the colour of the mood today
+    # Add the button to choose blue as the colour of the mood today
     blue_button = tk.Button(text=':)',
                             fg='blue',
                             font='Arial 20 bold',
@@ -263,9 +246,8 @@ def mood_colour_page():
                             width=10,
                             command=lambda: mood_emoji_page("blue_button")
                             )
-    # place the blue button
     blue_button.place(relx=0.5, rely=0.57, anchor='center', y=130)
-    # The button to choose purple as the colour of the mood today
+    # Add the button to choose purple as the colour of the mood today
     purple_button = tk.Button(text=':)',
                               fg='purple',
                               font='Arial 20 bold',
@@ -273,7 +255,6 @@ def mood_colour_page():
                               width=10,
                               command=lambda: mood_emoji_page("purple_button")
                               )
-    # place the purple button
     purple_button.place(relx=0.5, rely=0.57, anchor='center', y=195)
 
 def mood_emoji_page(mood_colour_button):
@@ -324,7 +305,7 @@ def mood_emoji_page(mood_colour_button):
     # where would you like to place this button
     question_label.place(relx=0.5, anchor='center', y=100)
 
-    # adding 😀 emoji
+    # add grinning_emoji button
     grinning_emoji = tk.Button(root,
                             text="😀",
                             font=("Optima", 25, "bold"),
@@ -332,9 +313,9 @@ def mood_emoji_page(mood_colour_button):
                             width=1,
                             command=lambda:weather_page("grinning_emoji")
                             )
-
     grinning_emoji.place(relx=0.2, rely=0.2, anchor='center', y=50)
-    # adding 😁 emoji
+
+    # add beaming_emoji button
     beaming_emoji = tk.Button(root,
                           text="😁",
                           height=1,
@@ -342,9 +323,9 @@ def mood_emoji_page(mood_colour_button):
                           font=("Optima", 25, "bold"),
                           command=lambda:weather_page("beaming_emoji")
                           )
-
     beaming_emoji.place(relx=0.2, rely=0.2, anchor='center', y=100)
-    # adding ☺️ emoji
+
+    # add smiling_emoji button
     smiling_emoji = tk.Button(root,
                                text="☺️",
                                height=1,
@@ -354,7 +335,8 @@ def mood_emoji_page(mood_colour_button):
                                )
 
     smiling_emoji.place(relx=0.2, rely=0.2, anchor='center', y=150)
-    # adding 😍 emoji
+
+    # add heart_eyes_emoji button
     heart_eyes_emoji = tk.Button(root,
                                 text="😍",
                                 height=1,
@@ -362,9 +344,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("heart_eyes_emoji")
                                 )
-
     heart_eyes_emoji.place(relx=0.2, rely=0.2, anchor='center', y=200)
-    # adding 🥰 emoji
+
+    # add heart_emoji button
     heart_emoji = tk.Button(root,
                                 text="🥰",
                                 height=1,
@@ -372,10 +354,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("heart_emoji")
                                 )
-
     heart_emoji.place(relx=0.2, rely=0.2, anchor='center', y=250)
 
-    # adding 😉 emoji
+    # add winking_emoji button
     winking_emoji = tk.Button(root,
                                 text="😉",
                                 height=1,
@@ -383,10 +364,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("winking_emoji")
                                 )
-
     winking_emoji.place(relx=0.2, rely=0.2, anchor='center', y=300)
 
-    # adding 😋 emoji
+    # add face_savoring_emoji button
     face_savoring_emoji = tk.Button(root,
                                 text="😋",
                                 height=1,
@@ -394,10 +374,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("face_savoring_emoji")
                                 )
-
     face_savoring_emoji.place(relx=0.2, rely=0.2, anchor='center', y=350)
 
-    # adding 😎 emoji
+    # add sunglasses_emoji button
     sunglasses_emoji = tk.Button(root,
                             text="😎",
                             font=("Optima", 25, "bold"),
@@ -405,9 +384,9 @@ def mood_emoji_page(mood_colour_button):
                             width=1,
                             command=lambda:weather_page("sunglasses_emoji")
                             )
-
     sunglasses_emoji.place(relx=0.4, rely=0.2, anchor='center', y=50)
-    # adding 🤩 emoji
+
+    # add star_struck_emoji
     star_struck_emoji = tk.Button(root,
                           text="🤩",
                           height=1,
@@ -415,9 +394,9 @@ def mood_emoji_page(mood_colour_button):
                           font=("Optima", 25, "bold"),
                           command=lambda:weather_page("star_struck_emoji")
                           )
-
     star_struck_emoji.place(relx=0.4, rely=0.2, anchor='center', y=100)
-    # adding 🥳️ emoji
+
+    # add partying_emoji button
     partying_emoji = tk.Button(root,
                                text="🥳",
                                height=1,
@@ -425,9 +404,9 @@ def mood_emoji_page(mood_colour_button):
                                font=("Optima", 25, "bold"),
                                command=lambda:weather_page("partying_emoji")
                                )
-
     partying_emoji.place(relx=0.4, rely=0.2, anchor='center', y=150)
-    # adding 🤪 emoji
+
+    # add zany_face_emoji button
     zany_face_emoji = tk.Button(root,
                                 text="🤪",
                                 height=1,
@@ -435,9 +414,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("zany_face_emoji")
                                 )
-
     zany_face_emoji.place(relx=0.4, rely=0.2, anchor='center', y=200)
-    # adding 😝 emoji
+
+    # add tongue_emoji button
     tongue_emoji = tk.Button(root,
                                 text="😝",
                                 height=1,
@@ -445,10 +424,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("tongue_emoji")
                                 )
-
     tongue_emoji.place(relx=0.4, rely=0.2, anchor='center', y=250)
 
-    # adding 😂 emoji
+    # add tears_of_joy_emoji button
     tears_of_joy_emoji = tk.Button(root,
                                 text="😂",
                                 height=1,
@@ -456,10 +434,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("tears_of_joy_emoji")
                                 )
-
     tears_of_joy_emoji.place(relx=0.4, rely=0.2, anchor='center', y=300)
 
-    # adding 🥲 emoji
+    # add single_tear_emoji button
     single_tear_emoji = tk.Button(root,
                                 text="🥲",
                                 height=1,
@@ -467,10 +444,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("single_tear_emoji")
                                 )
-
     single_tear_emoji.place(relx=0.4, rely=0.2, anchor='center', y=350)
 
-    # adding 😒 emoji
+    # add unamused_emoji button
     unamused_emoji = tk.Button(root,
                             text="😒",
                             font=("Optima", 25, "bold"),
@@ -478,9 +454,9 @@ def mood_emoji_page(mood_colour_button):
                             width=1,
                             command=lambda:weather_page("unamused_emoji")
                             )
-
     unamused_emoji.place(relx=0.6, rely=0.2, anchor='center', y=50)
-    # adding 😖 emoji
+
+    # add confounded_emoji button
     confounded_emoji = tk.Button(root,
                           text="😖",
                           height=1,
@@ -488,9 +464,9 @@ def mood_emoji_page(mood_colour_button):
                           font=("Optima", 25, "bold"),
                           command=lambda:weather_page("confounded_emoji")
                           )
-
     confounded_emoji.place(relx=0.6, rely=0.2, anchor='center', y=100)
-    # adding 😫 emoji
+
+    # add tired_emoji button
     tired_emoji = tk.Button(root,
                                text="😫",
                                height=1,
@@ -498,9 +474,9 @@ def mood_emoji_page(mood_colour_button):
                                font=("Optima", 25, "bold"),
                                command=lambda:weather_page("tired_emoji")
                                )
-
     tired_emoji.place(relx=0.6, rely=0.2, anchor='center', y=150)
-    # adding 🥺 emoji
+
+    # add pleading_emoji button
     pleading_emoji = tk.Button(root,
                                 text="🥺",
                                 height=1,
@@ -508,9 +484,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("pleading_emoji")
                                 )
-
     pleading_emoji.place(relx=0.6, rely=0.2, anchor='center', y=200)
-    # adding 😤 emoji
+
+    # add steam_nose_emoji button
     steam_nose_emoji = tk.Button(root,
                                 text="😤",
                                 height=1,
@@ -518,10 +494,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("steam_nose_emoji")
                                 )
-
     steam_nose_emoji.place(relx=0.6, rely=0.2, anchor='center', y=250)
 
-    # adding 😭 emoji
+    # add crying_emoji button
     crying_emoji = tk.Button(root,
                                 text="😭",
                                 height=1,
@@ -529,10 +504,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("crying_emoji")
                                 )
-
     crying_emoji.place(relx=0.6, rely=0.2, anchor='center', y=300)
 
-    # adding 😡 emoji
+    # add enraged_emoji button
     enraged_emoji = tk.Button(root,
                                 text="😡",
                                 height=1,
@@ -540,10 +514,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("enraged_emoji")
                                 )
-
     enraged_emoji.place(relx=0.6, rely=0.2, anchor='center', y=350)
 
-    # adding 🤬 emoji
+    # add swear_emoji button
     swear_emoji = tk.Button(root,
                             text="🤬",
                             font=("Optima", 25, "bold"),
@@ -551,9 +524,9 @@ def mood_emoji_page(mood_colour_button):
                             width=1,
                             command=lambda:weather_page("swear_emoji")
                             )
-
     swear_emoji.place(relx=0.8, rely=0.2, anchor='center', y=50)
-    # adding 🤯 emoji
+
+    # add exploding_head_emoji button
     exploding_head_emoji = tk.Button(root,
                           text="🤯",
                           height=1,
@@ -561,9 +534,9 @@ def mood_emoji_page(mood_colour_button):
                           font=("Optima", 25, "bold"),
                           command=lambda:weather_page("exploding_head_emoji")
                           )
-
     exploding_head_emoji.place(relx=0.8, rely=0.2, anchor='center', y=100)
-    # adding 😳 emoji
+
+    # add flushed_face_emoji button
     flushed_face_emoji = tk.Button(root,
                                text="😳",
                                height=1,
@@ -571,9 +544,9 @@ def mood_emoji_page(mood_colour_button):
                                font=("Optima", 25, "bold"),
                                command=lambda:weather_page("flushed_face_emoji")
                                )
-
     flushed_face_emoji.place(relx=0.8, rely=0.2, anchor='center', y=150)
-    # adding 😱 emoji
+
+    # add fear_emoji button
     fear_emoji = tk.Button(root,
                                 text="😱",
                                 height=1,
@@ -581,9 +554,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("fear_emoji")
                                 )
-
     fear_emoji.place(relx=0.8, rely=0.2, anchor='center', y=200)
-    # adding 😰 emoji
+
+    # add anxious_emoji button
     anxious_emoji = tk.Button(root,
                                 text="😰",
                                 height=1,
@@ -591,10 +564,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("anxious_emoji")
                                 )
-
     anxious_emoji.place(relx=0.8, rely=0.2, anchor='center', y=250)
 
-    # adding 😵‍💫 emoji
+    # add dizziness_emoji button
     dizziness_emoji = tk.Button(root,
                                 text="😵‍💫",
                                 height=1,
@@ -602,10 +574,9 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("dizziness_emoji")
                                 )
-
     dizziness_emoji.place(relx=0.8, rely=0.2, anchor='center', y=300)
 
-    # adding 😴 emoji
+    # add sleeping_emoji button
     sleeping_emoji = tk.Button(root,
                                 text="😴",
                                 height=1,
@@ -613,8 +584,8 @@ def mood_emoji_page(mood_colour_button):
                                 font=("Optima", 25, "bold"),
                                 command=lambda:weather_page("sleeping_emoji")
                                 )
-
     sleeping_emoji.place(relx=0.8, rely=0.2, anchor='center', y=350)
+
 
 def weather_page(emoji_button):
     """This is a page asking the weather of today"""
@@ -622,6 +593,7 @@ def weather_page(emoji_button):
     # clean all the widgets from the previous page
     clear_widgets(root)
 
+    #add different mood emojis to different emoji buttons
     if emoji_button=="grinning_emoji":
         mood_emoji="😀"
     elif emoji_button=="beaming_emoji":
@@ -680,22 +652,23 @@ def weather_page(emoji_button):
         mood_emoji = "️😵‍💫"
     elif emoji_button == "sleeping_emoji":
         mood_emoji = "😴"
+
     # add the image in the homepage
     add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
     # place the button to go back to previous page from the back_button definition
-    back_button(lambda:mood_emoji_page(mood_colour_button))
+    back_button(lambda:mood_emoji_page(f'{mood_emoji}'))
     #place the button to go back to main page from the home_button definition
     home_button()
-    #print a message to ask the weather of today
+
+    #add a message to ask the weather of today
     question_label = tk.Label(root, text='What is the weather today?',
                               font='optima 18 bold',
                               bg='light yellow',
                               fg='black',
                               borderwidth=12)
-    # where would you like to place this button
     question_label.place(relx=0.5, anchor='center', y=100)
 
-    # The button to choose sunny
+    # Add the button to choose sunny
     sunny_button = tk.Button(text='☀️',
                            font='Arial 20 bold',
                            height=2,
@@ -703,7 +676,7 @@ def weather_page(emoji_button):
                            command=lambda:health_page("sunny_button")
                            )
     sunny_button.place(relx=0.5, rely=0.57, anchor='center', y=-195)
-    # The button to choose sunny with clouds
+    # Add the button to choose sunny with clouds
     sunny_with_clouds_button = tk.Button(text='🌤️',
                               font='Arial 20 bold',
                               height=2,
@@ -711,7 +684,7 @@ def weather_page(emoji_button):
                               command=lambda:health_page("sunny_with_clouds_button")
                               )
     sunny_with_clouds_button.place(relx=0.5, rely=0.57, anchor='center', y=-130)
-    # The button to choose cloudy
+    # Add the button to choose cloudy
     cloudy_button= tk.Button(text='☁️',
                               font='Arial 20 bold',
                               height=2,
@@ -727,7 +700,7 @@ def weather_page(emoji_button):
                              command=lambda:health_page("rain_with_sun_button")
                              )
     rain_with_sun_button.place(relx=0.5, rely=0.57, anchor='center', y=0)
-    # The button to choose rainy
+    # Add the button to choose rainy
     rainy_button = tk.Button(text='🌧️',
                             font='Arial 20 bold',
                             height=2,
@@ -735,7 +708,7 @@ def weather_page(emoji_button):
                             command=lambda:health_page("rainy_button")
                             )
     rainy_button.place(relx=0.5, rely=0.57, anchor='center', y=65)
-    # The button to choose clouds with lightning
+    # Add the button to choose clouds with lightning
     clouds_with_lightning_button = tk.Button(text='⛈️',
                             font='Arial 20 bold',
                             height=2,
@@ -743,7 +716,7 @@ def weather_page(emoji_button):
                             command=lambda:health_page("clouds_with_lightning_button")
                             )
     clouds_with_lightning_button.place(relx=0.5, rely=0.57, anchor='center', y=130)
-    # The button to choose snowy
+    # Add the button to choose snowy
     snowy_button = tk.Button(text='🌨️',
                               font='Arial 20 bold',
                               height=2,
@@ -751,8 +724,7 @@ def weather_page(emoji_button):
                               command=lambda:health_page("snowy_button")
                               )
     snowy_button.place(relx=0.5, rely=0.57, anchor='center', y=195)
-
-    # The button to choose heavy snowy
+    # Add the button to choose heavy snowy
     heavy_snowy_button = tk.Button(text='❄️',
                               font='Arial 20 bold',
                               height=2,
@@ -762,12 +734,12 @@ def weather_page(emoji_button):
     heavy_snowy_button.place(relx=0.5, rely=0.57, anchor='center', y=195)
 
 
-
-
 def health_page(weather_button):
     global mood_colour,mood_emoji,weather_selection,health
     # clean all the widgets from the previous page
     clear_widgets(root)
+
+    #add different weather emojis to different weather buttons
     if weather_button=="sunny_button":
         weather_selection = "☀️"
     elif weather_button=="sunny_with_clouds_button":
@@ -784,21 +756,22 @@ def health_page(weather_button):
         weather_selection = "🌨️"
     elif weather_button=="heavy_snowy_button":
         weather_selection = "❄️"
+
     # add the image in the homepage
     add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
     # place the button to go back to previous page from the back_button definition
-    back_button(weather_page)
+    back_button(lambda:weather_page(f'{emoji_button}'))
     #place the button to go back to main page from the home_button definition
     home_button()
+    #add the question label to ask the health condition of the users
     question_label = tk.Label(root, text='How physically healthy are you?',
                               font='optima 18 bold',
                               bg='light yellow',
                               fg='black',
                               borderwidth=12)
-    # where would you like to place this button
     question_label.place(relx=0.5, anchor='center', y=100)
 
-    # The button to choose Excellent
+    # Add the button to choose Excellent
     excellent_button = tk.Button(text='Excellent',
                            font='Arial 20 bold',
                            height=2,
@@ -806,7 +779,7 @@ def health_page(weather_button):
                            command=lambda:diary_page("excellent_button")
                            )
     excellent_button.place(relx=0.5, rely=0.57, anchor='center', y=-195)
-    # The button to choose Good
+    # Add the button to choose Good
     good_button = tk.Button(text='Good️',
                               font='Arial 20 bold',
                               height=2,
@@ -814,7 +787,7 @@ def health_page(weather_button):
                               command=lambda:diary_page("good_button")
                               )
     good_button.place(relx=0.5, rely=0.57, anchor='center', y=-130)
-    # The button to choose So_so
+    # Add the button to choose So_so
     so_so_button= tk.Button(text='So so',
                               font='Arial 20 bold',
                               height=2,
@@ -822,7 +795,7 @@ def health_page(weather_button):
                               command=lambda:diary_page("so_so_button")
                               )
     so_so_button.place(relx=0.5, rely=0.57, anchor='center', y=-65)
-    # The button to choose rain with sun
+    # Add the button to choose rain with sun
     not_well_button = tk.Button(text='Not well',
                              font='Arial 20 bold',
                              height=2,
@@ -830,7 +803,7 @@ def health_page(weather_button):
                              command=lambda:diary_page("not_well_button")
                              )
     not_well_button.place(relx=0.5, rely=0.57, anchor='center', y=0)
-    # The button to choose Super_bad️
+    # Add the button to choose Super_bad️
     super_bad_button = tk.Button(text='Super bad️',
                             font='Arial 20 bold',
                             height=2,
@@ -840,9 +813,12 @@ def health_page(weather_button):
     super_bad_button.place(relx=0.5, rely=0.57, anchor='center', y=65)
 
 def diary_page(health_button):
+    global weather_button
     """This ia a page for entering the diary"""
     # destroy all the button in the colour button page
     clear_widgets(root)
+
+    # add different physical health conditions to different health buttons
     if health_button=="excellent_button":
         health = "Excellent"
     elif health_button=="good_button":
@@ -854,22 +830,22 @@ def diary_page(health_button):
     elif health_button=="super_bad_button":
         health = "Super bad"
 
-
-    # adding image on each colour page
+    # add image on each colour page
     add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
     # place the button to go back to previous page from the back_button definition
-    back_button(health_page)
+    back_button(lambda:health_page(f'{weather_button}'))
     #place the button to go back to main page from the home_button definition
     home_button()
-    # the welcome question
+
+    # add the welcome question
     welcome = tk.Label(text=f"Write down your Moody Diary ",
                        font='optima 25 bold',
                        bg='light grey',
                        borderwidth=3, fg=f'{mood_colour}'
                        )
-    # place welcome question on a grid
     welcome.place(relx=0.5, rely=0.1, anchor='center', y=50)
-    #print the mood emoji in the mood_emoji_page
+
+    #add the mood emoji label in the mood_emoji_page
     mood_emoji_label=tk.Label(text=f"Your mood: {mood_emoji}",
                         font='optima 20 bold',
                         bg='light grey',
@@ -877,7 +853,8 @@ def diary_page(health_button):
                         fg=f'{mood_colour}'
                         )
     mood_emoji_label.place(relx=0.5, rely=0.1, anchor='center', y=100)
-    #print the weather in the weather_page
+
+    #add the weather label in the weather_page
     weather_label=tk.Label(text=f"Weather: {weather_selection}",
                         font='optima 20 bold',
                         bg='light grey',
@@ -885,7 +862,8 @@ def diary_page(health_button):
                         fg=f'{mood_colour}'
                         )
     weather_label.place(relx=0.5, rely=0.1, anchor='center', y=140)
-    # print the weather in the health_page
+
+    # add the weather label in the health_page
     health_label = tk.Label(text=f"Health condition: {health}",
                        font='optima 20 bold',
                        bg='light grey',
@@ -894,22 +872,20 @@ def diary_page(health_button):
                        )
     health_label.place(relx=0.5, rely=0.1, anchor='center', y=180)
 
-    #add storyinp as a stringVar
-    storyinp = tk.StringVar()
-    # add the box for entering a story related to this colour
-    story_box = tk.Entry(root, textvar=storyinp, font='arial 20 bold')
-    # place story box on a grid
-    story_box.place(relx=0.5, rely=0.5, anchor='center', y=80,width=350,height=250)
+    # add the diary entry box
+    diary_entry=tk.Text(root,height=18, width=45)
+    diary_entry.place(relx=0.5, rely=0.5, anchor='center', y=80)
     # add buttons of Enter
     save_button = tk.Button(text='SAVE', font='optima 20 bold', height=2, width=7,command=recipe)
     save_button.place(relx=0.5, rely=0.5, anchor='center', y=240)
-        # store the emoji data
+
+    # store the emoji data
     user_mood_data = {"username": username.get(),
                         "mood_colour": mood_colour,
                         "mood_emoji": mood_emoji,
                         "weather": weather_selection,
                         "health": health,
-                        "diary":storyinp.get()
+                        "diary":diary_entry
                         }
     # converting the dictionary to a data frame
     user_data = pd.DataFrame([user_mood_data])
@@ -927,6 +903,7 @@ def recipe():
     #save_button.place(relx=0.8, anchor='center', y=100)
     # place the button to go back to previous page from the back_button definition
     #back_button(lambda:diary_page(health_button))
+
     #place the button to go back to main page from the home_button definition
     home_button()
 
@@ -934,13 +911,14 @@ def view_diary_page():
     """This is a page for viewing the diary"""
     # clean all the widgets from the previous page
     clear_widgets(root)
-    # adding image on each colour page
+    # add image on each colour page
     add_image(root, 'images/beginning_smile.png', screen_width, screen_height)
     # place the button to go back to previous page from the back_button definition
     back_button(calendar_page)
     # place the button to go back to main page from the home_button definition
     home_button()
-    # the welcome question
+
+    # add the welcome question
     welcome = tk.Label(text="Read your Moody Foody Diary",
                        font='optima 25 bold',
                        bg='light yellow',
@@ -948,9 +926,9 @@ def view_diary_page():
                        borderwidth=3,
                        #fg=f'{mood_colour}'
                        )
-    # place welcome question on a grid
     welcome.place(relx=0.5, rely=0.1, anchor='center', y=50)
-    #print the mood emoji in the mood_emoji_page
+
+    #add the mood emoji in the mood_emoji_page
     date_label=tk.Label(text="f'Date: {date}'",
                         font='optima 20 bold',
                         bg='light yellow',
@@ -958,7 +936,8 @@ def view_diary_page():
                         #fg=f'{mood_colour}'
                         )
     date_label.place(relx=0.5, rely=0.1, anchor='center', y=100)
-    #print the mood emoji in the mood_emoji_page
+
+    #add the mood emoji in the mood_emoji_page
     mood_emoji_label=tk.Label(text="f'Your mood: {mood_emoji}'",
                         font='optima 20 bold',
                         bg='light grey',
@@ -966,7 +945,8 @@ def view_diary_page():
                         #fg=f'{mood_colour}'
                         )
     mood_emoji_label.place(relx=0.5, rely=0.1, anchor='center', y=150)
-    #print the weather in the weather_page
+
+    #add the weather in the weather_page
     weather_label=tk.Label(text="f'Weather: {weather_selection}'",
                         font='optima 20 bold',
                         bg='light grey',
@@ -974,7 +954,8 @@ def view_diary_page():
                         #fg=f'{mood_colour}'
                         )
     weather_label.place(relx=0.5, rely=0.1, anchor='center', y=190)
-    # print the weather in the health_page
+
+    # add the weather in the health_page
     health_label = tk.Label(text="f'Health condition: {health}'",
                        font='optima 20 bold',
                        bg='light grey',
@@ -982,9 +963,23 @@ def view_diary_page():
                        #fg=f'{mood_colour}'
                        )
     health_label.place(relx=0.5, rely=0.1, anchor='center', y=230)
-    moody_diary=tk.Button(text='Moody Diary', font='optima 20 bold', height=2, width=10)
+
+    #add the Moody Diary button
+    moody_diary=tk.Button(text='Moody Diary',
+                          font='optima 20 bold',
+                          height=2,
+                          width=10,
+                          #command=diary_page
+                          )
     moody_diary.place(relx=0.5, rely=0.5, anchor='center', y=50)
-    foody_recipe = tk.Button(text='Foody Recipe', font='optima 20 bold', height=2, width=10)
+
+    #add the Foody Recipe button
+    foody_recipe = tk.Button(text='Foody Recipe',
+                             font='optima 20 bold',
+                             height=2,
+                             width=10
+                             #command=recipe
+                             )
     foody_recipe.place(relx=0.5, rely=0.5, anchor='center', y=150)
 
 

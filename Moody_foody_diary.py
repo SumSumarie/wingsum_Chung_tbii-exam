@@ -35,8 +35,10 @@ def back_button(page):
     back.place(relx = 0.2,anchor = 'ne',y=15)
 
 def show_today_date():
+    """This is a definition to show the date of today on each page of selection"""
+    #set current_date as the date of today
     current_date = date.today()
-    # add a label for today's date
+    # add and place a label for today's date
     today_date_label = tk.Label(root,
                                 text=(f"{current_date}"),
                                 font=("Optima", 15, "bold"),
@@ -54,9 +56,11 @@ def enter_user_data():
     birthday = cal.get_date()
     # get the list of user ids
     user_ids = list(pd.read_csv("data/user_data.csv").username)
+
     #warining message box will be shown when the username or the magic key were taken
     if username.get() in user_ids:
         tk.messagebox.showwarning("warning", "This username is taken")
+        return False
     else:
         user_data = {
             "username":username.get(),
@@ -66,6 +70,7 @@ def enter_user_data():
         # converting the dictionary to a data frame
         user_data = pd.DataFrame([user_data])
         user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a')
+        return True
 
 def home_page():
     """This the definition of showing the starting page """
@@ -105,8 +110,6 @@ def new_user_page():
     global username,cal
     # clean all the widgets from the previous page
     clear_widgets(root)
-    # call the birthday
-    #birthday = cal.get_date()
     #add the image in the main page
     add_image(root, 'images/beginning_smile.png',screen_width,screen_height)
     #place the button to go back to main page from the home_button definition
@@ -141,9 +144,6 @@ def new_user_page():
                     selectforeground="red"
                     )
     cal.place(x=130, y=350)
-    #get_birthday_date()
-    #store_user_data()
-    #get_current_user()
 
     # add the button to click to create a Moody Foody Diary
     create_diary_button = tk.Button(root,
@@ -158,11 +158,12 @@ def new_user_page():
 def after_create_diary_button():
     """This is the definition for the instruction after clicking the "Create your Moody Foody Diary" in the new_user_page"""
     global current_user,birthday_date
+    #add if else statement to add constrains when the date of birthday are the same date of today and the
     if str(cal.get_date())!=str(datetime.now().date()) and username.get():
-        current_user = username.get()
-        birthday_date=str(cal.get_date())
-        store_user_data()
-        calendar_page_new()
+        if enter_user_data():
+            current_user = username.get()
+            birthday_date=str(cal.get_date())
+            calendar_page_new()
     if str(cal.get_date())==str(datetime.now().date()):
         error_message = tk.Label(text="Are you sure you are born today?",
                                  bg="red",
@@ -179,20 +180,8 @@ def after_create_diary_button():
 
 
 
-def store_user_data():
-    """This is a definition to store the data of username, birthday and the time of creating the account to a csv file"""
-    user_data = {
-        "username": current_user,
-        "birthday": cal.get_date(),
-        "create_at": datetime.now().date()
-    }
-    # converting the dictionary to a data frame
-    user_data = pd.DataFrame([user_data])
-    user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a')
-
-
-
 def check_return_user():
+    global username
     # clean all the widgets from the previous page
     clear_widgets(root)
     #add the image in the main page
@@ -221,14 +210,27 @@ def check_return_user():
     enter_diary_button=tk.Button(root,
                             text="Enter your diary",
                             font='optima 20 bold',
-                            command=lambda:[get_current_user(),check_entry()]
+                            command=check_entry
                                  )
     enter_diary_button.place(relx = 0.5,anchor = 'center',y=500)
 def check_entry():
+
+    global current_user, birthday_date
+    if username.get():
+        current_user = username.get()
+        user_data = pd.read_csv("data/user_data.csv")
+        for i in user_data.index:
+            if user_data.loc[i, "username"] == current_user:
+                birthday_date = user_data.loc[i, "birthday"]
+    else:
+        error_message = tk.Label(text="You have not entered your username")
+        error_message.place(relx=0.5, anchor='center', y=300)
+
     user_data=pd.read_csv("data/user_data.csv")
     for i in user_data.index:
          if current_user==user_data.loc[i,"username"]:
              calendar_page_return()
+             break
          else:
              error_message = tk.Label(text="You haven't registered.")
              error_message.place(relx=0.5, anchor='center', y=300)
@@ -344,7 +346,7 @@ def calendar_page_new():
 
 def calendar_page_return():
     """This is a calendar page after the main page(log in)"""
-    global current_date
+    global current_date, mood_colour
     # clean all the widgets from the previous page
     clear_widgets(root)
 
@@ -391,7 +393,13 @@ def calendar_page_return():
     welcome_label.place(relx = 0.5,anchor = 'center',y=180)
     # get the date of today
     current_date = date.today()
-    # add a calendar to choose the date of today
+    # add a calendar to choose the date of
+    diary_data=pd.read_csv("data/user_mood_data.csv")
+    diary_data=diary_data.loc[diary_data["username"]==current_user]
+    #global mood_colour
+    current_entry = diary_data.loc[diary_data["created_at"] == str(current_date)].tail(1)
+    mood_colour = current_entry["mood_colour"].values[0]
+    global cal
     cal = Calendar(root,
                    selectmode='day',
                    year=current_date.year,
@@ -402,10 +410,22 @@ def calendar_page_return():
                    selectforeground=f"{mood_colour}"
                    )
     cal.place(relx=0.5, anchor='center', y=320)
+    cal.bind("<<CalendarSelected>>", change_colour_of_date)
+
     def get_selected_date():
         global selected_date
         selected_date=str(cal.get_date())
 
+def change_colour_of_date(event):
+    selected_date = str(cal.selection_get())
+    diary_data = pd.read_csv("data/user_mood_data.csv")
+    diary_data = diary_data.loc[diary_data["username"] == current_user]
+    current_entry = diary_data.loc[diary_data["created_at"] == str(selected_date)].tail(1)
+    if len(current_entry) > 0:
+        mood_colour = current_entry["mood_colour"].values[0]
+        cal.configure(selectforeground=f"{mood_colour}")
+    else:
+        cal.configure(selectforeground="white")
 
 
 
@@ -1055,29 +1075,7 @@ def health_page(weather_button):
                             )
     super_bad_button.place(relx=0.5, rely=0.57, anchor='center', y=65)
 
-def store_data():
-    if not diary_entry.get("1.0",'end-1c'):
-        error_message = tk.Label(text="You have not entered your diary",
-                                 bg="red",
-                                 fg="white"
-                                )
-        error_message.place(relx=0.5, anchor='center', y=210)
-    else:
-        # store the emoji data
-        user_mood_data = {"username": current_user,
-                            "mood_colour": mood_colour,
-                            "mood_emoji": mood_emoji,
-                            "weather": weather_selection,
-                            "health": health,
-                            "diary":diary_entry.get("1.0",'end-1c'),
-                            "created_at":datetime.now().date()
-                            }
-        # converting the dictionary to a data frame
-        user_data = pd.DataFrame([user_mood_data])
-        user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a')
-        # add buttons of getting a recipe
-        recipe_button = tk.Button(text='Now you have your recipe', font='optima 15 bold', height=1, width=20,command=recipe)
-        recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=260)
+
 
 
 def diary_page(health_button):
@@ -1211,12 +1209,22 @@ def diary_page_return():
 
 
 def recipe():
+
     """This is a page for generating the recipes"""
-    global title_label,back_button,img
+    global title_label,back_button,img,recipe_choice
     # clean all the widgets from the previous page
     clear_widgets(root)
+
     #adding the random recipy based on the colours that the users selected
-    add_image(root, f'images/{random.choice(options)}',screen_width,screen_height)
+    recipe_choice = random.choice(options)
+
+    diary_data = pd.read_csv("data/user_mood_data.csv")
+    selected_date = str(cal.get_date())
+    diary_data["recipe_choice"] = "blue01.jpg"
+    diary_data["recipe_choice"].loc[(diary_data["username"] == current_user) & (diary_data["created_at"] == selected_date)] = recipe_choice
+    print(diary_data)
+    diary_data.to_csv("data/user_mood_data.csv", index=False)
+    add_image(root, f'images/{recipe_choice}',screen_width,screen_height)
     # create and place a home page button
     calender_page = tk.Button(root,
                          text="🗓️",
@@ -1225,14 +1233,42 @@ def recipe():
 
 def recipe_return():
     """This is a page for generating the recipes"""
-    global title_label,back_button,img
+    global title_label,back_button,img, recipe_choice
     # clean all the widgets from the previous page
     clear_widgets(root)
     #adding the random recipy based on the colours that the users selected
-    add_image(root, f'images/{random.choice(options)}',screen_width,screen_height)
+    diary_data = pd.read_csv("data/user_mood_data.csv")
+    recipe_choice = diary_data.loc[(diary_data["username"] == current_user) & (diary_data["created_at"] == selected_date)].tail(1)
+    recipe_choice=recipe_choice["recipe_choice"].values[0]
+    print(recipe_choice)
+    add_image(root, f'images/{recipe_choice}',screen_width,screen_height)
     # place the button to go back to previous page from the back_button definition
     #back_button(view_diary_page(selected_date))
     home_button()
+
+def store_data():
+    if not diary_entry.get("1.0",'end-1c'):
+        error_message = tk.Label(text="You have not entered your diary",
+                                 bg="red",
+                                 fg="white"
+                                )
+        error_message.place(relx=0.5, anchor='center', y=210)
+    else:
+        # store the emoji data
+        user_mood_data = {"username": current_user,
+                            "mood_colour": mood_colour,
+                            "mood_emoji": mood_emoji,
+                            "weather": weather_selection,
+                            "health": health,
+                            "diary":diary_entry.get("1.0",'end-1c'),
+                            "created_at":datetime.now().date()
+                            }
+        # converting the dictionary to a data frame
+        user_data = pd.DataFrame([user_mood_data])
+        user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a')
+        # add buttons of getting a recipe
+        recipe_button = tk.Button(text='Now you have your recipe', font='optima 15 bold', height=1, width=20,command=recipe)
+        recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=260)
 
 def view_diary_page(selected_date):
     """This is a page for viewing the diary"""
@@ -1347,7 +1383,7 @@ def view_diary_page(selected_date):
 
 
 
-#start with the home page
+#The app will start with the home page
 home_page()
 
 #execute the code

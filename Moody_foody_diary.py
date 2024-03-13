@@ -2,7 +2,6 @@ import tkinter as tk
 from datetime import datetime
 from datetime import date
 from tkcalendar import Calendar
-from tkcalendar import DateEntry
 import pandas as pd
 from src.helper import clear_widgets, add_image
 from tkinter import messagebox
@@ -35,9 +34,20 @@ def back_button(page):
                    )
     back.place(relx = 0.2,anchor = 'ne',y=15)
 
+def show_today_date():
+    current_date = date.today()
+    # add a label for today's date
+    today_date_label = tk.Label(root,
+                                text=(f"{current_date}"),
+                                font=("Optima", 15, "bold"),
+                                bg='light yellow'
+                                )
+    today_date_label.place(y=20,x=250)
+
 
 def enter_user_data():
     """This is the definition of storing data of the users"""
+    global current_timestamp
     #create a timestamp
     current_timestamp=datetime.now()
     #call the birthday
@@ -58,7 +68,7 @@ def enter_user_data():
         user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a')
 
 def home_page():
-    """This the home page"""
+    """This the definition of showing the starting page """
     global username, magic_key, birthday
     # clean all the widgets from the previous page
     clear_widgets(root)
@@ -87,12 +97,12 @@ def home_page():
     return_user_button=tk.Button(root,
                             text="Return User",
                             font='optima 20 bold',
-                            command=return_user_page)
+                            command=check_return_user)
     return_user_button.place(relx = 0.5,anchor = 'center',y=550)
 
 def new_user_page():
-    global username, cal
-    #enter_user_data()
+    """This is a definition of the page for new users to create their username and enter their birthday"""
+    global username,cal
     # clean all the widgets from the previous page
     clear_widgets(root)
     # call the birthday
@@ -122,22 +132,133 @@ def new_user_page():
     birthday_label = tk.Label(root, text='Birthday', font='optima 20 bold', borderwidth=3)
     birthday_label.place(x=20,y=350)
     # add a calendar behind the label birthday
-    cal = DateEntry(root,
-                    font="Arial 20",
+    cal = Calendar(root,
+                    font="Arial 8",
                     selectmode="day",
-                    style='my.DateEntry'
+                    style='my.DateEntry',
+                    date_pattern='Y-mm-dd',
+                    foreground="red",
+                    selectforeground="red"
                     )
     cal.place(x=130, y=350)
-    #add the button to click to create a Moody Foody Diary
-    create_diary_button=tk.Button(root,
-                            text="Create your Moody Foody Diary",
+    #get_birthday_date()
+    #store_user_data()
+    #get_current_user()
+
+    # add the button to click to create a Moody Foody Diary
+    create_diary_button = tk.Button(root,
+                                    text="Create your Moody Foody Diary",
+                                    font='optima 20 bold',
+                                    command=after_create_diary_button
+                                    )
+    create_diary_button.place(relx=0.5, anchor='center', y=550)
+    date = tk.Label(root, text="")
+
+
+def after_create_diary_button():
+    """This is the definition for the instruction after clicking the "Create your Moody Foody Diary" in the new_user_page"""
+    global current_user,birthday_date
+    if str(cal.get_date())!=str(datetime.now().date()) and username.get():
+        current_user = username.get()
+        birthday_date=str(cal.get_date())
+        store_user_data()
+        calendar_page_new()
+    if str(cal.get_date())==str(datetime.now().date()):
+        error_message = tk.Label(text="Are you sure you are born today?",
+                                 bg="red",
+                                 fg="white"
+                                 )
+        error_message.place(relx=0.65, anchor='center', y=520)
+    if not username.get():
+        error_message = tk.Label(text="You have not entered your username",
+                                 bg="red",
+                                 fg="white"
+                                 )
+        error_message.place(relx=0.65, anchor='center', y=300)
+
+
+
+
+def store_user_data():
+    """This is a definition to store the data of username, birthday and the time of creating the account to a csv file"""
+    user_data = {
+        "username": current_user,
+        "birthday": cal.get_date(),
+        "create_at": datetime.now().date()
+    }
+    # converting the dictionary to a data frame
+    user_data = pd.DataFrame([user_data])
+    user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a')
+
+
+
+def check_return_user():
+    # clean all the widgets from the previous page
+    clear_widgets(root)
+    #add the image in the main page
+    add_image(root, 'images/beginning_smile.png',screen_width,screen_height)
+    #place the button to go back to main page from the home_button definition
+    home_button()
+    # add a message saying 'Open your Moody Foody Diary'
+    title_label = tk.Label(root,
+                           text='---------Moody Foody Diary---------',
+                           font='optima 25 bold',
+                           bg='light yellow',
+                           borderwidth=20)
+    title_label.place(relx = 0.5,anchor = 'center',y=100)
+    # add a message asking the user for their user name
+    username_label = tk.Label(root, text='Username', font='optima 20 bold', borderwidth=3)
+    username_label.place(x=20, y=250)
+    # add a user-name entry box
+    username = tk.StringVar()
+    username_entry = tk.Entry(root,
+                              textvar=username,
+                              font='optima 20 bold',
+                              width=15)
+    username_entry.place(x=130, y=250)
+
+    #add the button to click to enter your diary
+    enter_diary_button=tk.Button(root,
+                            text="Enter your diary",
                             font='optima 20 bold',
-                            command=calendar_page_new)
-    create_diary_button.place(relx = 0.5,anchor = 'center',y=500)
+                            command=lambda:[get_current_user(),check_entry()]
+                                 )
+    enter_diary_button.place(relx = 0.5,anchor = 'center',y=500)
+def check_entry():
+    user_data=pd.read_csv("data/user_data.csv")
+    for i in user_data.index:
+         if current_user==user_data.loc[i,"username"]:
+             calendar_page_return()
+         else:
+             error_message = tk.Label(text="You haven't registered.")
+             error_message.place(relx=0.5, anchor='center', y=300)
+             error_message2 = tk.Label(text="Would you like to register as new user?")
+             error_message2.place(relx=0.5, anchor='center', y=350)
+             # add the button to for new user page
+             new_user_button = tk.Button(root,
+                                         text="New User",
+                                         font='optima 20 bold',
+                                         command=new_user_page)
+             new_user_button.place(relx=0.5, anchor='center', y=550)
+
+
+def get_current_user():
+    global current_user, birthday_date
+    if username.get():
+        current_user = username.get()
+        user_data=pd.read_csv("data/user_data.csv")
+        for i in user_data.index:
+            if user_data.loc[i,"username"]==current_user:
+                birthday_date=user_data.loc[i,"birthday"]
+    else:
+        error_message=tk.Label(text="You have not entered your username")
+        error_message.place(relx = 0.5,anchor = 'center',y=300)
+
+
 
 
 def return_user_page():
-    global username, magic_key
+    global current_user, magic_key
     # clean all the widgets from the previous page
     clear_widgets(root)
     #add the image in the main page
@@ -161,12 +282,7 @@ def return_user_page():
                         font='optima 20 bold',
                         width=15)
     username_entry.place(x=130,y=300)
-    #add the button to click to enter your diary
-    enter_diary_button=tk.Button(root,
-                            text="Enter your diary",
-                            font='optima 20 bold',
-                            command=calendar_page_return)
-    enter_diary_button.place(relx = 0.5,anchor = 'center',y=500)
+
 
 def calendar_page_new():
     """This is a calendar page after the main page(log in)"""
@@ -187,7 +303,7 @@ def calendar_page_new():
     create_diary.place(relx=0.5, anchor='center', y=520)
     #add a welcome label
     welcome_label=tk.Label(root,
-                           text=(f"{username.get()}"),
+                           text=(current_user),
                            font=("Optima", 25,"bold"),
                            bg='light yellow'
                             )
@@ -214,11 +330,10 @@ def calendar_page_new():
                            bg='light yellow'
                             )
     today_date_label.place(relx = 0.5,anchor = 'center',y=250)
-    # store the birthday
+
     #add a label for birthday
     birthday_date_label=tk.Label(root,
-                                 text=("birthday"),
-                           #text=(f"Your birthday is {birthday}"),
+                                 text=("birthday: " + birthday_date),
                            font=("Optima", 25,"bold"),
                            bg='light yellow'
                             )
@@ -226,8 +341,10 @@ def calendar_page_new():
 
 
 
+
 def calendar_page_return():
     """This is a calendar page after the main page(log in)"""
+    global current_date
     # clean all the widgets from the previous page
     clear_widgets(root)
 
@@ -241,7 +358,7 @@ def calendar_page_return():
     view_diary = tk.Button(root,
                            font=("Optima", 25, "bold"),
                            text="View your diaries",
-                           command=view_diary_page
+                           command=lambda:[get_selected_date(),view_diary_page(selected_date)]
                            )
     view_diary.place(relx=0.5, anchor='center', y=450)
     #add a create_diary button for entering the diary information
@@ -253,7 +370,7 @@ def calendar_page_return():
     create_diary.place(relx=0.5, anchor='center', y=520)
     #add a welcome label
     welcome_label=tk.Label(root,
-                           text=(f"{username.get()}"),
+                           text=(current_user),
                            font=("Optima", 25,"bold"),
                            bg='light yellow'
                             )
@@ -272,15 +389,26 @@ def calendar_page_return():
                            bg='light yellow'
                             )
     welcome_label.place(relx = 0.5,anchor = 'center',y=180)
-    #get the date of today
+    # get the date of today
     current_date = date.today()
-    #add a calendar to choose the date of today
+    # add a calendar to choose the date of today
     cal = Calendar(root,
                    selectmode='day',
                    year=current_date.year,
                    month=current_date.month,
-                   day=current_date.day)
-    cal.place(relx = 0.5,anchor = 'center',y=320)
+                   day=current_date.day,
+                   date_pattern='Y-mm-dd',
+                   foreground="red",
+                   selectforeground=f"{mood_colour}"
+                   )
+    cal.place(relx=0.5, anchor='center', y=320)
+    def get_selected_date():
+        global selected_date
+        selected_date=str(cal.get_date())
+
+
+
+
 
 
 def mood_colour_page():
@@ -363,6 +491,7 @@ def mood_colour_page():
                               command=lambda: mood_emoji_page("purple_button")
                               )
     purple_button.place(relx=0.5, rely=0.57, anchor='center', y=195)
+    show_today_date()
 
 def mood_emoji_page(mood_colour_button):
     """this is the page to choose the mood emoji"""
@@ -404,6 +533,7 @@ def mood_emoji_page(mood_colour_button):
     back_button(mood_colour_page)
     #place the button to go back to main page from the home_button definition
     home_button()
+    show_today_date()
     question_label = tk.Label(root, text='What is your mood today?',
                               font='optima 18 bold',
                               bg='light yellow',
@@ -693,12 +823,16 @@ def mood_emoji_page(mood_colour_button):
                                 )
     sleeping_emoji.place(relx=0.8, rely=0.2, anchor='center', y=350)
 
+    show_today_date()
+
+
 
 def weather_page(emoji_button):
     """This is a page asking the weather of today"""
     global mood_colour, mood_colour_button,mood_emoji
     # clean all the widgets from the previous page
     clear_widgets(root)
+
 
     #add different mood emojis to different emoji buttons
     if emoji_button=="grinning_emoji":
@@ -766,6 +900,7 @@ def weather_page(emoji_button):
     back_button(lambda:mood_emoji_page(f'{mood_emoji}'))
     #place the button to go back to main page from the home_button definition
     home_button()
+    show_today_date()
 
     #add a message to ask the weather of today
     question_label = tk.Label(root, text='What is the weather today?',
@@ -870,6 +1005,7 @@ def health_page(weather_button):
     back_button(lambda:weather_page(f'{weather_selection}'))
     #place the button to go back to main page from the home_button definition
     home_button()
+    show_today_date()
     #add the question label to ask the health condition of the users
     question_label = tk.Label(root, text='How physically healthy are you?',
                               font='optima 18 bold',
@@ -920,33 +1056,29 @@ def health_page(weather_button):
     super_bad_button.place(relx=0.5, rely=0.57, anchor='center', y=65)
 
 def store_data():
-    # store the emoji data
-    user_mood_data = {"username": username.get(),
-                        "mood_colour": mood_colour,
-                        "mood_emoji": mood_emoji,
-                        "weather": weather_selection,
-                        "health": health,
-                        "diary":diary_entry.get("1.0",'end-1c')
-                        }
-    # converting the dictionary to a data frame
-    user_data = pd.DataFrame([user_mood_data])
-    user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a')
-    # add buttons of getting a recipe
-    recipe_button = tk.Button(text='Now you have your recipe', font='optima 15 bold', height=1, width=20,command=recipe)
-    recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=260)
+    if not diary_entry.get("1.0",'end-1c'):
+        error_message = tk.Label(text="You have not entered your diary",
+                                 bg="red",
+                                 fg="white"
+                                )
+        error_message.place(relx=0.5, anchor='center', y=210)
+    else:
+        # store the emoji data
+        user_mood_data = {"username": current_user,
+                            "mood_colour": mood_colour,
+                            "mood_emoji": mood_emoji,
+                            "weather": weather_selection,
+                            "health": health,
+                            "diary":diary_entry.get("1.0",'end-1c'),
+                            "created_at":datetime.now().date()
+                            }
+        # converting the dictionary to a data frame
+        user_data = pd.DataFrame([user_mood_data])
+        user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a')
+        # add buttons of getting a recipe
+        recipe_button = tk.Button(text='Now you have your recipe', font='optima 15 bold', height=1, width=20,command=recipe)
+        recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=260)
 
-"""
-def show_data():
- ""'This is a page to read the data""'
-    users_data=pd.read_csv("data/user_mood_data.csv")
-    date=list(users_data.date)
-
-    for d in date:
-        tk.Label(root,
-                 text=d)
-        entry =list(users_data[users_data.date]==d].diary_entry)[5]
-        tk.Label(root,text=entry)
-"""
 
 def diary_page(health_button):
     global weather_button,health, diary_entry
@@ -972,6 +1104,7 @@ def diary_page(health_button):
     back_button(lambda:health_page(f'{health}'))
     #place the button to go back to main page from the home_button definition
     home_button()
+    show_today_date()
 
     # add the welcome question
     welcome = tk.Label(text=f"Write down your Moody Diary ",
@@ -1013,28 +1146,26 @@ def diary_page(health_button):
     save_button.place(relx=0.5, rely=0.5, anchor='center', y=220)
 
 
-def diary_page_return(health_button):
+def diary_page_view():
+    clear_widgets(root)
+    # add image on each colour page
+    add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
+    # place the button to go back to previous page from the back_button definition
+    back_button(diary_page_return())
+    # place the button to go back to main page from the home_button definition
+    home_button()
+
+
+
+def diary_page_return():
     global weather_button,health, diary_entry
     """This ia a page for entering the diary"""
     # destroy all the button in the colour button page
     clear_widgets(root)
-
-    # add different physical health conditions to different health buttons
-    if health_button=="excellent_button":
-        health = "Excellent"
-    elif health_button=="good_button":
-        health = "Good"
-    elif health_button=="so_so_button":
-        health = "So so"
-    elif health_button=="not_well_button":
-        health = "Not well"
-    elif health_button=="super_bad_button":
-        health = "Super bad"
-
     # add image on each colour page
     add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
     # place the button to go back to previous page from the back_button definition
-    back_button(view_diary_page)
+    back_button(view_diary_page(selected_date))
     #place the button to go back to main page from the home_button definition
     home_button()
 
@@ -1100,78 +1231,120 @@ def recipe_return():
     #adding the random recipy based on the colours that the users selected
     add_image(root, f'images/{random.choice(options)}',screen_width,screen_height)
     # place the button to go back to previous page from the back_button definition
-    back_button(view_diary_page)
+    #back_button(view_diary_page(selected_date))
+    home_button()
 
-def view_diary_page():
+def view_diary_page(selected_date):
     """This is a page for viewing the diary"""
     # clean all the widgets from the previous page
     clear_widgets(root)
-    # add image on each colour page
-    add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
-    # place the button to go back to previous page from the back_button definition
-    back_button(calendar_page_return)
-    # place the button to go back to main page from the home_button definition
-    home_button()
+    diary_data=pd.read_csv("data/user_mood_data.csv")
+    diary_data=diary_data.loc[diary_data["username"]==current_user]
+    diary_dates=diary_data['created_at'].to_list()
+    if selected_date in diary_dates:
+        global mood_colour,mood_emoji,health,weather,diary
+        current_entry=diary_data.loc[diary_data["created_at"]==selected_date].tail(1)
+        mood_colour=current_entry["mood_colour"].values[0]
+        mood_emoji = current_entry["mood_emoji"].values[0]
+        health = current_entry["health"].values[0]
+        weather = current_entry["weather"].values[0]
+        diary = current_entry["diary"].values[0]
 
-    # add the welcome question
-    welcome = tk.Label(text="Read your Moody Foody Diary",
-                       font='optima 25 bold',
-                       bg='light yellow',
-                       #bg=f'{mood_colour}'
-                       borderwidth=3,
-                       )
-    welcome.place(relx=0.5, rely=0.1, anchor='center', y=50)
 
-    #add the mood emoji in the mood_emoji_page
-    date_label=tk.Label(text=f'Date: {date.today()}',
-                        font='optima 20 bold',
-                        bg='light yellow',
-                        borderwidth=3,
-                        #command=enter_user_data
-                        )
-    date_label.place(relx=0.5, rely=0.1, anchor='center', y=100)
+        # add image on each colour page
+        add_image(root, f"images/{mood_colour}_smile.jpg", screen_width, screen_height)
+        # place the button to go back to previous page from the back_button definition
+        back_button(calendar_page_return)
+        # place the button to go back to main page from the home_button definition
+        home_button()
+        diary_data=pd.read_csv("data/user_mood_data.csv")
+        print(diary_data)
 
-    #add the mood emoji in the mood_emoji_page
-    mood_emoji_label=tk.Label(text=f'Your mood: {mood_emoji}',
-                        font='optima 20 bold',
-                        bg='light yellow',
-                        borderwidth=3,
-                        )
-    mood_emoji_label.place(relx=0.5, rely=0.1, anchor='center', y=150)
+        # add the welcome question
+        welcome = tk.Label(text="Read your Moody Foody Diary",
+                           font='optima 25 bold',
+                           bg='light yellow',
+                           #bg=f'{mood_colour}'
+                           borderwidth=3,
+                           )
+        welcome.place(relx=0.5, rely=0.1, anchor='center', y=50)
 
-    #add the weather in the weather_page
-    weather_label=tk.Label(text=f'Weather: {weather_selection}',
-                        font='optima 20 bold',
-                        bg='light yellow',
-                        borderwidth=3,
-                        )
-    weather_label.place(relx=0.5, rely=0.1, anchor='center', y=190)
+        #add the mood emoji in the mood_emoji_page
+        date_label=tk.Label(text='Date: ' + selected_date,
+                            font='optima 20 bold',
+                            bg='light yellow',
+                            borderwidth=3,
+                            #command=enter_user_data
+                            )
+        date_label.place(relx=0.5, rely=0.1, anchor='center', y=100)
 
-    # add the weather in the health_page
-    health_label = tk.Label(text=f'Health condition: {health}',
-                       font='optima 20 bold',
-                       bg='light yellow',
-                       borderwidth=3,
-                       )
-    health_label.place(relx=0.5, rely=0.1, anchor='center', y=230)
+        diary_data=diary_data.loc[diary_data["username"]==current_user]
+        list_index=[]
+        for i in diary_data.index:
+            diary_entry=False
+            if selected_date== str(diary_data.loc[i,"created_at"]):
+                diary_entry=True
+                list_index.append(i)
+            if diary_entry==True:
+                i=list_index[-1]
+                print(i)
+                #add the mood emoji in the mood_emoji_page
+                mood_emoji_label=tk.Label(text='Your mood: ' + diary_data.loc[i,"mood_emoji"],
+                                    font='optima 20 bold',
+                                    bg='light yellow',
+                                    borderwidth=3,
+                                    )
+                mood_emoji_label.place(relx=0.5, rely=0.1, anchor='center', y=150)
 
-    #add the Moody Diary button
-    moody_diary=tk.Button(text='Moody Diary',
-                          font='optima 20 bold',
-                          height=2,
-                          width=10,
-                          command=lambda:diary_page_return(f"weather_selection")
-                          )
-    moody_diary.place(relx=0.5, rely=0.5, anchor='center', y=50)
+                #add the weather in the weather_page
+                weather_label=tk.Label(text='Weather: ' + diary_data.loc[i,"weather"],
+                                    font='optima 20 bold',
+                                    bg='light yellow',
+                                    borderwidth=3,
+                                    )
+                weather_label.place(relx=0.5, rely=0.1, anchor='center', y=190)
 
-    #add the Foody Recipe button
-    foody_recipe = tk.Button(text='Foody Recipe',
-                             font='optima 20 bold',
-                             height=2,
-                             width=10,
-                             command=recipe_return
-                             )
-    foody_recipe.place(relx=0.5, rely=0.5, anchor='center', y=150)
+                # add the weather in the health_page
+                health_label = tk.Label(text='Health: ' + diary_data.loc[i,"health"],
+                                   font='optima 20 bold',
+                                   bg='light yellow',
+                                   borderwidth=3,
+                                   )
+                health_label.place(relx=0.5, rely=0.1, anchor='center', y=230)
+
+
+                diary_box = tk.Canvas(root, width=300, height=230, bg="white")
+                diary_box.place(relx=0.5, rely=0.5, anchor='center', y=110)
+                diary_label = tk.Label(text=  diary_data.loc[i, "diary"],
+                                        font='optima 10 bold',
+                                        bg="white"
+                                        )
+                diary_label.place(x=27, y=325)
+                # add buttons of Enter
+                foody_recipe_button = tk.Button(text='View your Foody Recipe', font='optima 15 bold', height=1, width=20,
+                                               command=recipe_return)
+                foody_recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=250)
+
+    else:
+        # add the image in the main page
+        add_image(root, 'images/beginning_smile.png', screen_width, screen_height)
+        # place the button to go back to main page from the home_button definition
+        home_button()
+        # add a message saying 'Open your Moody Foody Diary'
+        title_label = tk.Label(root,
+                               text='---------Moody Foody Diary---------',
+                               font='optima 25 bold',
+                               bg='light yellow',
+                               borderwidth=20)
+        title_label.place(relx=0.5, anchor='center', y=100)
+        no_diary_message=tk.Label(text="You haven't created your diary that day",
+                                  font=20,
+                                  bg="red",
+                                  fg="white")
+        no_diary_message.place(relx=0.5, rely=0.5, anchor='center', y=100)
+
+
+
 
 
 #start with the home page

@@ -34,3 +34,8 @@ If you don't want to create a new user account:
 
 ### Others:
 1. "🏠" in each page is the button to go back to the starting home page.
+2. user_data.csv is for storing the register information of the users
+3. user_mood_data.csv is for storing the diary data
+4. There are only three recipe images of each colour in the images folder. The recipes are randomly picked.
+
+Built by [Sum](https://github.com/SumSumarie) 

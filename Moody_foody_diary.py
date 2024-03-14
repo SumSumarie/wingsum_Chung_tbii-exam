@@ -7,6 +7,7 @@ from src.helper import clear_widgets, add_image
 from tkinter import messagebox
 import pygame as pg
 import random
+import csv
 
 #set tk as root
 root = tk.Tk()
@@ -34,6 +35,7 @@ def back_button(page):
                    )
     back.place(relx = 0.2,anchor = 'ne',y=15)
 
+
 def show_today_date():
     """This is a definition to show the date of today on each page of selection"""
     #set current_date as the date of today
@@ -49,9 +51,9 @@ def show_today_date():
 
 def enter_user_data():
     """This is the definition of storing data of the users"""
-    global current_timestamp
+    global current_timestamp,birthday
     #create a timestamp
-    current_timestamp=datetime.now()
+    current_timestamp=datetime.now().strftime("%Y-%m-%d")
     #call the birthday
     birthday = cal.get_date()
     # get the list of user ids
@@ -70,7 +72,8 @@ def enter_user_data():
         }
         # converting the dictionary to a data frame
         user_data = pd.DataFrame([user_data])
-        user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a')
+        #convert the data to the csv file, using quoteing for all (panda file https: // stackoverflow.com / questions / 21147058 / pandas - to - csv - output - quoting - issue)
+        user_data.to_csv("data/user_data.csv", index=False, header=False, mode='a',quoting=csv.QUOTE_ALL)
         return True
 
 def home_page():
@@ -298,12 +301,12 @@ def calendar_page_new():
                             )
     create_diary.place(relx=0.5, anchor='center', y=520)
     #add a label to show the username
-    welcome_label=tk.Label(root,
+    username_label=tk.Label(root,
                            text=(current_user),
                            font=("Optima", 40,"bold"),
                            bg='light pink'
                             )
-    welcome_label.place(relx = 0.5,anchor = 'center',y=100)
+    username_label.place(relx = 0.5,anchor = 'center',y=100)
     #add labels to show the welcoming messages "Welcome to your own Moody Foody Diary"
     welcome_label=tk.Label(root,
                            text=("Welcome to"),
@@ -376,8 +379,8 @@ def calendar_page_return():
     #add username of the current user
     username_label=tk.Label(root,
                            text=(current_user),
-                           font=("Optima", 25,"bold"),
-                           bg='light yellow'
+                           font=("Optima", 40,"bold"),
+                           bg='light pink'
                             )
     username_label.place(relx = 0.5,anchor = 'center',y=100)
     #add welcome labels to show the message "Welcome to your own Moody Foody Diary"
@@ -386,13 +389,13 @@ def calendar_page_return():
                            font=("Optima", 20,"bold"),
                            bg='light yellow'
                             )
-    welcome_label.place(relx = 0.5,anchor = 'center',y=140)
+    welcome_label.place(relx = 0.5,anchor = 'center',y=160)
     welcome_label=tk.Label(root,
                            text=("your own Moody Foody Diary"),
                            font=("Optima", 25,"bold"),
                            bg='light yellow'
                             )
-    welcome_label.place(relx = 0.5,anchor = 'center',y=180)
+    welcome_label.place(relx = 0.5,anchor = 'center',y=200)
     # get the date of today
     current_date = date.today()
     # reade the dataframe to get the username in the current user
@@ -418,10 +421,11 @@ def calendar_page_return():
     #bind the function of change_colour_of_date to selecting the date in the calender(Virtual Events: https://tkcalendar.readthedocs.io/en/stable/Calendar.html)
     cal.bind("<<CalendarSelected>>", change_colour_of_date)
 
-    def get_selected_date():
-        """This is a definition for getting the selected birthday"""
-        global selected_date
-        selected_date=str(cal.get_date())
+def get_selected_date():
+    """This is a definition for getting the selected date"""
+    global selected_date
+    selected_date = str(cal.get_date())
+
 
 def change_colour_of_date(event):
     """This is a definition of changing the colour of the date for the calender, which will bind with the <<CalendarSelected>>"""
@@ -1202,7 +1206,10 @@ def diary_page_return():
     diary_entry=tk.Text(root,height=18, width=45)
     diary_entry.place(relx=0.5, rely=0.5, anchor='center', y=80)
     # add buttons to view your recipe
-    view_recipe_button = tk.Button(text='View your recipe', font='optima 15 bold', height=1, width=20,command=recipe_return)
+    view_recipe_button = tk.Button(text='View your recipe',
+                                   font='optima 15 bold',
+                                   height=1, width=20,
+                                   command=recipe_return)
     view_recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=220)
 
 
@@ -1212,20 +1219,14 @@ def recipe():
     global title_label,back_button,img,recipe_choice
     # clean all the widgets from the previous page
     clear_widgets(root)
-
     #adding the random recipy based on the colours that the users selected
     recipe_choice = random.choice(options)
-
     #reading the data from the user_mood_data.csv file
     diary_data = pd.read_csv("data/user_mood_data.csv")
     selected_date = str(cal.get_date())
-    #print(recipe_choice)
-    diary_data["recipe_choice"] = recipe_choice
-    #read the recipe choice of the date selected by the current user
-    diary_data["recipe_choice"].loc[(diary_data["username"] == current_user) & (diary_data["created_at"] == selected_date)] = recipe_choice
-    #print(diary_data)
-    #print(recipe_choice)
-    diary_data.to_csv("data/user_mood_data.csv", index=False)
+    # Append the random recipe to the DataFrame
+    diary_data.loc[diary_data.index[-1], "recipe_choice"] = recipe_choice
+    diary_data.to_csv("data/user_mood_data.csv", index=False,quoting=csv.QUOTE_ALL)
     add_image(root, f'images/{recipe_choice}',screen_width,screen_height)
     # create and place a home page button
     calender_page = tk.Button(root,
@@ -1245,12 +1246,12 @@ def recipe_return():
     recipe_choice = diary_data.loc[(diary_data["username"] == current_user) & (diary_data["created_at"] == selected_date)].tail(1)
     #select the recipe choice in the dataframe
     recipe_choice=recipe_choice["recipe_choice"].values[0]
-    print(recipe_choice)
     #add the image of the previously generated recipe
     add_image(root, f'images/{recipe_choice}',screen_width,screen_height)
     # place the button to go back to previous page from the back_button definition
     #back_button(view_diary_page(selected_date))
     home_button()
+    back_button(calendar_page_return)
 
 def store_data():
     """This is a definition for storing the data of the diary choices"""
@@ -1275,7 +1276,7 @@ def store_data():
                             }
         # converting the dictionary to a data frame
         user_data = pd.DataFrame([user_mood_data])
-        user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a')
+        user_data.to_csv("data/user_mood_data.csv", index=False, header=False, mode='a',quoting=csv.QUOTE_ALL)
         # add buttons of getting a recipe after saving the diary data
         recipe_button = tk.Button(text='Now you have your recipe', font='optima 15 bold', height=1, width=20,command=recipe)
         recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=260)
@@ -1284,14 +1285,31 @@ def view_diary_page(selected_date):
     """This is a definition of the page for viewing the diary"""
     # clean all the widgets from the previous page
     clear_widgets(root)
-    #reading the dataframe to get the values of each variables
+    #read the dataframe to get the values of username from the current user
     diary_data=pd.read_csv("data/user_mood_data.csv")
-    diary_data=diary_data.loc[diary_data["username"]==current_user]
+    diary_data = diary_data.loc[diary_data["username"] == current_user]
+    # read the dataframe to get the values of birthday from the current user
+    user_data = pd.read_csv("data/user_data.csv")
+    user_data = user_data.loc[user_data["username"] == current_user]
     diary_dates=diary_data['created_at'].to_list()
+    birthday = user_data['birthday'].to_list()
+
+    # Access the first element of the list of birthday
+    birthday_string = birthday[0]
+    # Split the string by '-'
+    split_birthday = birthday_string.split('-')
+    # Extract month and date from the split_date list
+    birthday_month = int(split_birthday[1])  # Convert to integer if needed
+    birthday_day = int(split_birthday[2])  # Convert to integer if needed
+    # Split the string by '-'
+    split_selected_date = selected_date.split('-')
+    # Extract month and date from the split_date list
+    selected_month = int(split_selected_date[1])  # Convert to integer if needed
+    selected_day = int(split_selected_date[2])  # Convert to integer if needed
 
     #if there is diary entry at the selected date, it will fetch the data of the that day
     if selected_date in diary_dates:
-        global mood_colour,mood_emoji,health,weather,diary
+        global mood_colour,mood_emoji,health,weather,diary, current_entry
         current_entry=diary_data.loc[diary_data["created_at"]==selected_date].tail(1)
         mood_colour=current_entry["mood_colour"].values[0]
         mood_emoji = current_entry["mood_emoji"].values[0]
@@ -1305,15 +1323,13 @@ def view_diary_page(selected_date):
         back_button(calendar_page_return)
         # place the button to go back to main page from the home_button definition
         home_button()
-
+        #read the diary data for displaying in the view_diary_page
         diary_data=pd.read_csv("data/user_mood_data.csv")
-        print(diary_data)
 
         # add the welcome question
         welcome = tk.Label(text="Read your Moody Foody Diary",
                            font='optima 25 bold',
                            bg='light yellow',
-                           #bg=f'{mood_colour}'
                            borderwidth=3,
                            )
         welcome.place(relx=0.5, rely=0.1, anchor='center', y=50)
@@ -1323,7 +1339,6 @@ def view_diary_page(selected_date):
                             font='optima 20 bold',
                             bg='light yellow',
                             borderwidth=3,
-                            #command=enter_user_data
                             )
         date_label.place(relx=0.5, rely=0.1, anchor='center', y=100)
 
@@ -1338,7 +1353,6 @@ def view_diary_page(selected_date):
                 list_index.append(i)
             if diary_entry==True:
                 i=list_index[-1]
-                print(i)
                 #add the mood emoji selected in the mood_emoji_page to the view_diary_page
                 mood_emoji_label=tk.Label(text='Your mood: ' + diary_data.loc[i,"mood_emoji"],
                                     font='optima 20 bold',
@@ -1377,6 +1391,23 @@ def view_diary_page(selected_date):
                                                command=recipe_return)
                 foody_recipe_button.place(relx=0.5, rely=0.5, anchor='center', y=250)
 
+
+
+
+                if birthday_month == selected_month and birthday_day == selected_day:
+                    birthday_label = tk.Label(text="Happy birthday to you!",
+                                           font='optima 15 bold',
+                                           bg=mood_colour
+                                           )
+                    birthday_label.place(relx=0.5, rely=0.1, anchor='center', y=450)
+                    birthday_label = tk.Label(text="You had a special recipe that day!",
+                                              font='optima 15 bold',
+                                              bg=mood_colour
+                                              )
+                    birthday_label.place(relx=0.5, rely=0.1, anchor='center', y=480)
+
+
+
     #if the there is no diary entry, then it will go to the entry diary page with the message of no diary entry
     else:
         # add the background image of the smiling faces with different colours in the page where there is no diary entry and selected mood colour
@@ -1392,10 +1423,12 @@ def view_diary_page(selected_date):
         title_label.place(relx=0.5, anchor='center', y=100)
         #add the message for showing no diary entry
         no_diary_message=tk.Label(text="You haven't created your diary that day",
-                                  font=20,
+                                  font=40,
                                   bg="red",
                                   fg="white")
-        no_diary_message.place(relx=0.5, rely=0.5, anchor='center', y=100)
+        no_diary_message.place(relx=0.5, rely=0.5, anchor='center', y=50)
+        #add the back button to go back to calendar_page_return page
+        back_button(calendar_page_return)
 
 
 #The app will start with the home page
